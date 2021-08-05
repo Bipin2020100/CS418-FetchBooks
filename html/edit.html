@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+    integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link rel="stylesheet" href="..css\library.css">
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="index.html">CS418 WebApp project</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" href="about.html">About us </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="virtualTour.html">Virtual Tour</a>
+        </li>
+        <li class="nav-item active">
+          <a class="nav-link" href="books.html">Books</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <h1>Edit Book Form</h1>
+  <p1>Note : Form fields marked with asterick(*) are required</p1>
+
+  <form id ="editBook">
+    <div class="form-group">
+      <label for="formGroupExampleInput">*Book Title </label>
+      <input type="text" class="form-control" id="formGroupExampleInput" placeholder="Example input">
+    </div>
+    <div class="form-group">
+      <label for="formGroupExampleInput2">*ISBN</label>
+      <input type="text" class="form-control" id="formGroupExampleInput2" placeholder="Another input">
+    </div>
+    <div class="form-group">
+      <label for="formGroupExampleInput2">*Overdue Fee per day</label>
+      <input type="number" class="form-control" id="formGroupExampleInput2" placeholder="Another input">
+    </div>
+    <div class="form-group">
+      <label for="formGroupExampleInput2">*Publisher</label>
+      <input type="text" class="form-control" id="formGroupExampleInput2" placeholder="Another input">
+    </div>
+    <div class="form-group">
+      <label for="formGroupExampleInput2">*Date Published</label>
+      <input type="date" class="form-control" id="formGroupExampleInput2" placeholder="Another input">
+    </div>
+    <input type="reset">
+    <input type="submit">
+  </form>
+  <script>
+    // const editBookForm = documnet.getElementById("newBook");
+    const bookIdInput = document.getElementById("bookId")
+    const titleInput = document.getElementById("bookTitle");
+    const isbnInput = document.getElementById("isbn");
+    const overdueFeeInput = document.getElementById("overdueFee");
+    const publisherInput = document.getElementById("publisher");
+    const datePublishedInput = document.getElementById("datePublished");
+
+    function displayBookData(){
+
+      const parameter = new URLSearchParams(window.location.search);
+      const bookId = parameter.get("bookId");
+      fetch("https://elibraryrestapi.herokuapp.com/elibrary/api/book/add"+bookId)
+      .then((response)=> {
+        if(response.ok){
+          return response.json();
+        } else {
+          return Promise.reject({status: response.status})
+        }
+      })
+      .then(book =>{
+        bookIdInput.value = book.bookId;
+        titleInput.value = book.title;
+        isbnInput.value = book.isbn;
+        overdueFeeInput.value = book.overdueFee;
+        publisherInput.value = book.publisher;
+        datePublishedInput.value = book.datePublished;
+      })
+      .catch (err => {
+        console.log("error message")
+      });
+
+    }
+    displayBookData();
+
+    editBook.addEventListener("submit", function(e) {
+      e.preventDefault();
+      // const bookId = bookIdInput.value;
+      // const bookId = bookIdInput.value;
+      const title = titleInput.value;
+      const isbn = isbnInput.value;
+      const overdueFee = parseFloat(overdueFeeInput.value);
+      const publisher = publisherInput.value;
+      const datePublished = datePublishedInput.value;
+      const newBookData = {
+        // "bookId": bookId
+        "isbn": isbn,
+        "title": title,
+        "overdueFee": overdueFeeInput,
+        "publisher": publisher,
+        "datePublished": datePublished
+      };
+//to fetch book by its id
+      fetch("https://elibraryrestapi.herokuapp.com/elibrary/api/book/update/"+bookId, {
+        method: "put",
+        body: JSON.stringify(editBookData),
+        headers: {
+          "Content-Type": "application/json"
+        }
+      }).then(function (response) {
+        return response.json();
+      }).then(function (resData) {
+        console.log(resData);
+        titleInput.value = "";
+        isbnInput.value = "",
+        overdueFeeInput.value = "0.00",
+        publisherInput.value = "",
+        datePublishedInput.value = "";
+        txtTitle.focus();
+                alertMessageBox.style.display = "inline-block";
+      }).catch(function (error) {
+        console.error(error);
+      })
+    })
+
+
+  </script>
+
+
+</body>
+
+</html>
